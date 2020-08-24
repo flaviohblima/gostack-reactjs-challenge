@@ -1,31 +1,62 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import api from './services/api'
 
 import "./styles.css";
 
 function App() {
-  async function handleAddRepository() {
-    // TODO
-  }
+    const [repositories, setRepositories] = useState([]);
 
-  async function handleRemoveRepository(id) {
-    // TODO
-  }
+    useEffect(() => {
+        api.get('repositories').then(response => {
+            setRepositories(response.data);
+        });
+    }, []);
 
-  return (
-    <div>
-      <ul data-testid="repository-list">
-        <li>
-          Repositório 1
+    async function handleAddRepository() {
+        try {
+            const response = await api.post('repositories/', {
+                title: `Repositório para o desafio ${new Date().toLocaleTimeString()}`,
+                url: "https://github.com/flaviohblima/gostack-nodejs-challenge",
+                techs: ["Node.js", "Yarn", "Express"]
+            });
 
-          <button onClick={() => handleRemoveRepository(1)}>
-            Remover
-          </button>
-        </li>
-      </ul>
+            const repository = response.data;
 
-      <button onClick={handleAddRepository}>Adicionar</button>
-    </div>
-  );
+            setRepositories([...repositories, repository]);
+        } catch (error) {
+            console.error("An error ocurred trying to create Repository");
+        }
+    }
+
+    async function handleRemoveRepository(id) {
+        try {
+            const response = await api.delete('repositories/' + id);
+            console.log(response.status);
+
+            const filteredRepositories = repositories.filter(repository => repository.id !== id);
+            setRepositories(filteredRepositories);
+        } catch (error) {
+            console.error("An error ocurred trying to delete Repository " + id);
+        }
+    }
+
+    return (
+        <div>
+            <ul data-testid="repository-list">
+                {repositories.map(repository => (
+                    <li key={repository.id}>
+                        {repository.title}
+
+                        <button onClick={() => handleRemoveRepository(repository.id)}>
+                            Remover
+                        </button>
+                    </li>
+                ))}
+            </ul>
+
+            <button onClick={handleAddRepository}>Adicionar</button>
+        </div>
+    );
 }
 
 export default App;
