@@ -14,7 +14,7 @@ function App() {
 
     async function handleAddRepository() {
         try {
-            const response = await api.post('repositories/', {
+            const response = await api.post('repositories', {
                 title: `Repositório para o desafio ${new Date().toLocaleTimeString()}`,
                 url: "https://github.com/flaviohblima/gostack-nodejs-challenge",
                 techs: ["Node.js", "Yarn", "Express"]
@@ -44,7 +44,7 @@ function App() {
         <div>
             <ul data-testid="repository-list">
                 {repositories.map(repository => (
-                    <li key={repository.id}>
+                    <li key={repository.id} >
                         {repository.title}
 
                         <button onClick={() => handleRemoveRepository(repository.id)}>
